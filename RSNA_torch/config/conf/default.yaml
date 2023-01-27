@@ -1,0 +1,5 @@
+defaults:
+  - path: paths
+  - classes: class
+  - preprocess: resize
+  - training: train_configs

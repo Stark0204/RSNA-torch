@@ -1,0 +1,4 @@
+- label: 0
+  name: Not Cancer
+- label: 1
+  name: Cancer

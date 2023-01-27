@@ -1,0 +1,13 @@
+dataset:
+  csv:
+    train_full: /Users/kms/Desktop/Competitions/RSNA Screening Mammography Breast Cancer Detection/Dataset/train_full.csv
+    train: /Users/kms/Desktop/Competitions/RSNA Screening Mammography Breast Cancer Detection/Dataset/train.csv
+    val: /Users/kms/Desktop/Competitions/RSNA Screening Mammography Breast Cancer Detection/Dataset/val.csv
+    test: /Users/kms/Desktop/Competitions/RSNA Screening Mammography Breast Cancer Detection/Dataset/test.csv
+    submission: /Users/kms/Desktop/Competitions/RSNA Screening Mammography Breast Cancer Detection/Dataset/test_submission.csv
+  images:
+    train_full: /Users/kms/Desktop/Competitions/RSNA Screening Mammography Breast Cancer Detection/Dataset/train_full_images
+    submission: /Users/kms/Desktop/Competitions/RSNA Screening Mammography Breast Cancer Detection/Dataset/test_submission_images
+output:
+  predictions:
+  summary:
