@@ -8,7 +8,7 @@ import pytorch_lightning as pl
 from logging import getLogger
 from pytorch_lightning.utilities.types import EPOCH_OUTPUT
 
-from P_F1 import ProbF1Score
+from F1Score.P_F1 import ProbF1Score
 
 log = getLogger(__name__)
 
