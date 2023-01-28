@@ -67,7 +67,7 @@ class RSNADatasetModule(torch.utils.data.Dataset):
         image_dir = os.path.join(self.images_dir, patient_id, image_id)
         dicom_image = di.dcmread(image_dir).pixel_array
         # -- START Transformations --
-        dicom_image = RSNAresize(dicom_image, self.cfg.training.resize.width, self.cfg.training.resize.height)  # Resize image
+        dicom_image = RSNAresize(dicom_image, self.cfg.preprocess.resize.width, self.cfg.preprocess.resize.height)  # Resize image
         # -- END Transformations   --
         dicom_image_tensor = torch.Tensor(dicom_image.astype('int64', casting='same_kind'))  # Convert image to Tensor
         if self.mode != 'submission':
