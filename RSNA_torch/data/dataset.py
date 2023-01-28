@@ -25,6 +25,7 @@ def RSNAresize(dicom_image: np.array):
 
 class RSNADatasetModule(torch.utils.data.Dataset):
     def __init__(self, cfg: DictConfig, mode: str = None) -> None:
+        super().__init__()
         self.patient_ids: List = None
         self.data_df: DataFrame = None
         self.cfg = cfg
