@@ -1,10 +1,10 @@
 mode: train
-loss_function: focal_loss/binary_cross_entropy_loss
+loss_function: focal_loss
 num_workers: 3
 batch_size: 32
 epochs: 50
 optimizer:
-  name: Adam/SGD/Adamax
+  name: Adam
   lr: 0.001
   scheduler: None
   weight_decay: 0.0001

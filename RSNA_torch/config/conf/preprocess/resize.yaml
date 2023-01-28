@@ -1,2 +1,3 @@
-width: 2000
-height: 2500
+resize:
+  width: 2000
+  height: 2500

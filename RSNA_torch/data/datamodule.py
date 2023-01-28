@@ -13,8 +13,10 @@ logger = getLogger(__name__)
 class RSNADataModule(pl.LightningDataModule):
     dataset_module: torch.utils.data.Dataset
 
-    def __init__(self, cfg: DictConfig):
+    def __init__(self, cfg: DictConfig) -> None:
         super().__init__()
+
+        self.train, self.val, self.test, self.predict = None
         self.cfg = cfg
         self.batch_size = cfg.training.batch_size
 

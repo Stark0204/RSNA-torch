@@ -12,13 +12,16 @@ from omegaconf import DictConfig
 log = getLogger(__name__)
 
 
-def RSNAresize(dicom_image: np.array):
+def RSNAresize(dicom_image: np.array, width: int, height: int):
     """
+    :param height: image to be resized to
+    :param width: image to be resized to
     :param dicom_image: np.array
     :return: dicom_image: np.array
     """
     # Step - I (Resize image to a fixed size)
-    dicom_image = cv2.resize(dicom_image, (2000, 2500))
+    #(width, height)
+    dicom_image = cv2.resize(dicom_image, (width, height))
     log.info("Resized to dimension 2000x2500")
     return dicom_image
 
@@ -51,7 +54,7 @@ class RSNADatasetModule(torch.utils.data.Dataset):
     def load_dataframe(self) -> None:
         self.data_df = pd.read_csv(self.data_dir)
         log.info(f"Loading {self.mode} Dataset complete.")
-    
+
     def __iter__(self):
         return self
 
@@ -64,7 +67,7 @@ class RSNADatasetModule(torch.utils.data.Dataset):
         image_dir = os.path.join(self.images_dir, patient_id, image_id)
         dicom_image = di.dcmread(image_dir).pixel_array
         # -- START Transformations --
-        dicom_image = RSNAresize(dicom_image)  # Resize image
+        dicom_image = RSNAresize(dicom_image, self.cfg.training.resize.width, self.cfg.training.resize.height)  # Resize image
         # -- END Transformations   --
         dicom_image_tensor = torch.Tensor(dicom_image.astype('int64', casting='same_kind'))  # Convert image to Tensor
         if self.mode != 'submission':
