@@ -20,7 +20,7 @@ class RSNAlighningModule(pl.LightningModule):
         self.test_results = None
         self.cfg = cfg
         self.network = self.init_model()
-        self.criterion = self.init_critetrion(cfg)
+        self.criterion = self.init_criterion(cfg)
 
     def init_model(self) -> torch.nn.Module:
         raise NotImplementedError
