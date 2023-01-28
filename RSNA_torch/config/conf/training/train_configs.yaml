@@ -1,5 +1,10 @@
 mode: train
-loss_function: focal_loss
+loss_function:
+  name: focal_loss
+  gamma: 0.0
+  alpha:
+    - 0.0
+    - 0.0
 num_workers: 3
 batch_size: 32
 epochs: 50

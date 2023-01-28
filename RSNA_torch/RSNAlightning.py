@@ -1,11 +1,11 @@
-from typing import Dict, Tuple, List, Union
-
 import numpy as np
 import torch
 import torchvision
 import torch.nn.functional as TF
 import pytorch_lightning as pl
 from logging import getLogger
+from focal_loss.focal_loss import FocalLoss
+from typing import Dict, Tuple, List, Union
 from pytorch_lightning.utilities.types import EPOCH_OUTPUT
 
 log = getLogger(__name__)
@@ -26,11 +26,11 @@ class RSNAlighningModule(pl.LightningModule):
         raise NotImplementedError
 
     def init_criterion(self, cfg):
-        loss_function = self.cfg.training.loss_function
+        loss_function = self.cfg.training.loss_function.name
         loss_function = loss_function.lower()
         if loss_function == 'focal_loss' or loss_function == 'fl':
-            criterion = torchvision.ops.sigmoid_focal_loss()
-        elif loss_function == 'binary_cross_entropy_loss' or loss_function == 'bcel':
+            criterion = FocalLoss(gamma=self.cfg.training.loss_function.gamma, weights=self.cfg.training.loss_function.alpha)
+        elif loss_function == 'binary_cross_entropy_loss' or loss_function == 'bcel' or 'bce':
             criterion = torch.nn.BCELoss()
 
         return criterion
