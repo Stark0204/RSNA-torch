@@ -51,6 +51,9 @@ class RSNADatasetModule(torch.utils.data.Dataset):
     def load_dataframe(self) -> None:
         self.data_df = pd.read_csv(self.data_dir)
         log.info(f"Loading {self.mode} Dataset complete.")
+    
+    def __iter__(self):
+        return self
 
     def __getitem__(self, idx: int) -> tuple:
         row = self.data_df.loc[[idx]]
