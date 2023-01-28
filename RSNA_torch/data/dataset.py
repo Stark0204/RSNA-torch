@@ -19,7 +19,7 @@ def RSNAresize(dicom_image: np.array):
     """
     # Step - I (Resize image to a fixed size)
     dicom_image = cv2.resize(dicom_image, (2000, 2500))
-    log.warning("Resized to dimension 2000x2500")
+    log.info("Resized to dimension 2000x2500")
     return dicom_image
 
 
