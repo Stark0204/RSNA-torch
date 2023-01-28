@@ -16,13 +16,13 @@ class RSNADataModule(pl.LightningDataModule):
     def __init__(self, cfg: DictConfig):
         super().__init__()
         self.cfg = cfg
-        self.batch_size = self.cfg.training.batch_size
+        self.batch_size = cfg.training.batch_size
 
     def setup(self, stage: str):
         if stage == 'fit':
             if self.cfg.training.mode == 'train':
                 self.train = self.dataset_module(self.cfg, mode='train')
-                self.val = self.dataset.module(self.cfg, mode='val')
+                self.val = self.dataset_module(self.cfg, mode='val')
             else:
                 self.train = self.dataset_module(self.cfg, mode='full')
                 self.val = None
