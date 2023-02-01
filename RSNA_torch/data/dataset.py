@@ -59,7 +59,7 @@ class RSNADatasetModule(torch.utils.data.Dataset):
         log.warning(f"Loading {self.mode} csv Dataset complete.")
 
     @staticmethod
-    def process(index, filename):
+    def process(self, index, filename):
         data_dict[index] = dict()
         dicom_image = di.dcmread(filename).pixel_array
         # -- START Transformations --
