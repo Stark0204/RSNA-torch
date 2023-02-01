@@ -66,8 +66,8 @@ class RSNADatasetModule(torch.utils.data.Dataset):
         # {0:image_pixel_data1, 1: image_pixel_data2,... }
         image_dir = []
         for i in range(len(self.data_df)):
-            patient_id = str(self.data_df.loc[[i]].patient_id)
-            image_id = str(self.data_df.loc[[i]].patient_id) + '.dcm'
+            patient_id = str(self.data_df.loc[[i]].patient_id[i])
+            image_id = str(self.data_df.loc[[i]].image_id[i]) + '.dcm'
             img_dir = os.path.join(self.images_dir, patient_id, image_id)
             image_dir.append(img_dir)
 
