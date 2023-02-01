@@ -56,7 +56,7 @@ class RSNADatasetModule(torch.utils.data.Dataset):
 
     def load_dataframe(self) -> None:
         self.data_df = pd.read_csv(self.data_dir)
-        log.info(f"Loading {self.mode} csv Dataset complete.")
+        log.warning(f"Loading {self.mode} csv Dataset complete.")
 
     def process(self, index, filename):
         dicom_image = di.dcmread(filename).pixel_array
@@ -75,7 +75,7 @@ class RSNADatasetModule(torch.utils.data.Dataset):
             delayed(self.process)(idx, f)
             for idx, f in enumerate(image_dir)
         )
-        log.info(f"Loading {self.mode} image Dataset complete.")
+        log.warning(f"Loading {self.mode} image Dataset complete.")
 
     def __iter__(self):
         return self
