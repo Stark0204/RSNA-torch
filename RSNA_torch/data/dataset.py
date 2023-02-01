@@ -48,7 +48,6 @@ class RSNADatasetModule(torch.utils.data.Dataset):
         elif mode == 'submission':
             self.data_dir = cfg.path.dataset.csv.test_submission
             self.images_dir = cfg.path.datase.images.test_submission_images
-
         self.load_dataframe()
         self.load_images()
 
@@ -63,6 +62,10 @@ class RSNADatasetModule(torch.utils.data.Dataset):
     def process(index, filename):
         data_dict[index] = dict()
         dicom_image = di.dcmread(filename).pixel_array
+        # -- START Transformations --
+        dicom_image = RSNAresize(dicom_image, self.cfg.preprocess.resize.width,
+                                 self.cfg.preprocess.resize.height)  # Resize image
+        # -- END Transformations   --
         data_dict[index]['data'] = dicom_image
         return data_dict
 
@@ -92,10 +95,6 @@ class RSNADatasetModule(torch.utils.data.Dataset):
         dicom_image = self.data_dict[idx]['data']
         if self.mode != 'submission':
             label = row['cancer']
-        # -- START Transformations --
-        dicom_image = RSNAresize(dicom_image, self.cfg.preprocess.resize.width,
-                                 self.cfg.preprocess.resize.height)  # Resize image
-        # -- END Transformations   --
         dicom_image_tensor = torch.Tensor(dicom_image.astype('int64', casting='same_kind'))  # Convert image to Tensor
         if self.mode != 'submission':
             return dicom_image_tensor, label
