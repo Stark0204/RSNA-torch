@@ -80,7 +80,7 @@ class RSNADatasetModule(torch.utils.data.Dataset):
 
         self.data_dict = Parallel(n_jobs=3)(
             delayed(self.process)(idx, f)
-            for idx, f in enumerate(image_dir[:20])
+            for idx, f in enumerate(image_dir)
         )
         self.data_dict = dict(ChainMap(*self.data_dict))
 
