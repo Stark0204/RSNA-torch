@@ -1,13 +1,14 @@
-import cv2
 import os
+import cv2
 import torch
 import numpy as np
 import pandas as pd
 import pydicom as di
-from typing import List
 from pandas import DataFrame
+from typing import List, Dict
 from logging import getLogger
 from omegaconf import DictConfig
+from joblib import Parallel, delayed
 
 log = getLogger(__name__)
 
@@ -20,7 +21,7 @@ def RSNAresize(dicom_image: np.array, width: int, height: int):
     :return: dicom_image: np.array
     """
     # Step - I (Resize image to a fixed size)
-    #(width, height)
+    # (width, height)
     dicom_image = cv2.resize(dicom_image, (width, height))
     log.info("Resized to dimension 2000x2500")
     return dicom_image
@@ -29,6 +30,7 @@ def RSNAresize(dicom_image: np.array, width: int, height: int):
 class RSNADatasetModule(torch.utils.data.Dataset):
     def __init__(self, cfg: DictConfig, mode: str = None) -> None:
         super().__init__()
+        self.data_dict: Dict = None
         self.patient_ids: List = None
         self.data_df: DataFrame = None
         self.cfg = cfg
@@ -47,27 +49,47 @@ class RSNADatasetModule(torch.utils.data.Dataset):
             self.images_dir = cfg.path.datase.images.test_submission_images
 
         self.load_dataframe()
+        self.load_images()
 
     def __len__(self) -> int:
         return len(self.data_df)
 
     def load_dataframe(self) -> None:
         self.data_df = pd.read_csv(self.data_dir)
-        log.info(f"Loading {self.mode} Dataset complete.")
+        log.info(f"Loading {self.mode} csv Dataset complete.")
+
+    def process(self, index, filename):
+        self.data_dict = dict()
+        dicom_image = di.dcmread(filename).pixel_array
+        self.data_dict[index] = dicom_image
+
+    def load_images(self) -> None:
+        # {0:image_pixel_data1, 1: image_pixel_data2,... }
+        image_dir = []
+        for i in range(len(self.data_df)):
+            self.data_dict[i] = dict()
+            patient_id = str(self.data_df.loc[[i]].patient_id)
+            image_id = str(self.data_df.loc[[i]].patient_id) + '.dcm'
+            img_dir = os.path.join(self.images_dir, patient_id, image_id)
+            image_dir.append(img_dir)
+
+        Parallel(n_jobs=0)(
+            delayed(self.process)(idx, f)
+            for idx, f in enumerate(image_dir)
+        )
+        log.info(f"Loading {self.mode} image Dataset complete.")
 
     def __iter__(self):
         return self
 
     def __getitem__(self, idx: int) -> tuple:
         row = self.data_df.loc[[idx]]
-        patient_id = str(row.patient_id[idx])  # Get Patient id
-        image_id = str(row.image_id[idx]) + '.dcm'  # Get Image id
+        dicom_image = self.data_dict[idx]
         if self.mode != 'submission':
-            label = row.cancer[idx]  # Get Label
-        image_dir = os.path.join(self.images_dir, patient_id, image_id)
-        dicom_image = di.dcmread(image_dir).pixel_array
+            label = row['cancer']
         # -- START Transformations --
-        dicom_image = RSNAresize(dicom_image, self.cfg.preprocess.resize.width, self.cfg.preprocess.resize.height)  # Resize image
+        dicom_image = RSNAresize(dicom_image, self.cfg.training.resize.width,
+                                 self.cfg.training.resize.height)  # Resize image
         # -- END Transformations   --
         dicom_image_tensor = torch.Tensor(dicom_image.astype('int64', casting='same_kind'))  # Convert image to Tensor
         if self.mode != 'submission':
