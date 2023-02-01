@@ -58,7 +58,6 @@ class RSNADatasetModule(torch.utils.data.Dataset):
         self.data_df = pd.read_csv(self.data_dir)
         log.warning(f"Loading {self.mode} csv Dataset complete.")
 
-    @staticmethod
     def process(self, index, filename):
         data_dict[index] = dict()
         dicom_image = di.dcmread(filename).pixel_array
