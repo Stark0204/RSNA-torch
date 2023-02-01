@@ -76,7 +76,7 @@ class RSNADatasetModule(torch.utils.data.Dataset):
             img_dir = os.path.join(self.images_dir, patient_id, image_id)
             image_dir.append(img_dir)
 
-        self.data_dict = Parallel(n_jobs=-1)(
+        self.data_dict = Parallel(n_jobs=3)(
             delayed(self.process)(idx, f)
             for idx, f in enumerate(image_dir)
         )
