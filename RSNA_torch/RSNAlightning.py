@@ -67,7 +67,6 @@ class RSNAlighningModule(pl.LightningModule):
         :param y: (batch_size, 1)
         :return: score
         """
-        softmax_layer = TF.softmax(y_hat, dim=1)
         y_hat = torch.max(softmax_layer, dim=1).indices
         score = ProbF1Score(y_hat, y, beta=self.cfg.training.accuracy.beta).f1_score()
 
