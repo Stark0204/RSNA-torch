@@ -30,7 +30,7 @@ def RSNAresize(dicom_image: np.array, width: int, height: int):
 class RSNADatasetModule(torch.utils.data.Dataset):
     def __init__(self, cfg: DictConfig, mode: str = None) -> None:
         super().__init__()
-        self.data_dict: Dict = None
+        self.data_dict: Dict = dict()
         self.patient_ids: List = None
         self.data_df: DataFrame = None
         self.cfg = cfg
@@ -59,7 +59,6 @@ class RSNADatasetModule(torch.utils.data.Dataset):
         log.info(f"Loading {self.mode} csv Dataset complete.")
 
     def process(self, index, filename):
-        self.data_dict = dict()
         dicom_image = di.dcmread(filename).pixel_array
         self.data_dict[index] = dicom_image
 
@@ -67,7 +66,6 @@ class RSNADatasetModule(torch.utils.data.Dataset):
         # {0:image_pixel_data1, 1: image_pixel_data2,... }
         image_dir = []
         for i in range(len(self.data_df)):
-            self.data_dict[i] = dict()
             patient_id = str(self.data_df.loc[[i]].patient_id)
             image_id = str(self.data_df.loc[[i]].patient_id) + '.dcm'
             img_dir = os.path.join(self.images_dir, patient_id, image_id)
