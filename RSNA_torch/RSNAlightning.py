@@ -1,7 +1,5 @@
 import numpy as np
 import torch
-import torchvision
-import torch.nn.functional as TF
 import pytorch_lightning as pl
 from logging import getLogger
 from focal_loss.focal_loss import FocalLoss
@@ -29,8 +27,9 @@ class RSNAlighningModule(pl.LightningModule):
         loss_function = self.cfg.training.loss_function.name
         loss_function = loss_function.lower()
         if loss_function == 'focal_loss' or loss_function == 'fl':
-            criterion = FocalLoss(gamma=self.cfg.training.loss_function.gamma, weights=self.cfg.training.loss_function.alpha)
-        elif loss_function == 'binary_cross_entropy_loss' or loss_function == 'bcel' or 'bce':
+            criterion = FocalLoss(gamma=self.cfg.training.loss_function.gamma,
+                                  weights=self.cfg.training.loss_function.alpha)
+        elif loss_function == 'binary_cross_entropy_loss' or loss_function == 'bcel' or loss_function == 'bce':
             criterion = torch.nn.BCELoss()
 
         return criterion
@@ -63,12 +62,14 @@ class RSNAlighningModule(pl.LightningModule):
     def calc_accuracy(self, y_hat: torch.Tensor, y: torch.Tensor):
         """
 
-        :param y_hat: (batch_size, 2, 1)
+        :param y_hat: (batch_size) -> contains the probability values
         :param y: (batch_size, 1)
         :return: score
         """
-        y_hat = torch.max(softmax_layer, dim=1).indices
-        score = ProbF1Score(y_hat, y, beta=self.cfg.training.accuracy.beta).f1_score()
+        #Check
+        threshold = self.cfg.training.loss_function.threshold
+        y_hat_label = torch.where(y_hat > threshold, 1.0, 0.0)
+        score = ProbF1Score(y_hat_label, y, beta=self.cfg.training.accuracy.beta).f1_score()
 
         return score
 

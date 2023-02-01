@@ -5,6 +5,7 @@ loss_function:
   alpha:
     - 0.0
     - 0.0
+  threshold: 0.5
 num_workers: 3
 batch_size: 32
 epochs: 50
