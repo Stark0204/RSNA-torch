@@ -52,7 +52,7 @@ class RSNADatasetModule(torch.utils.data.Dataset):
         self.load_images()
 
     def __len__(self) -> int:
-        return len(self.data_df)
+        return 10#len(self.data_df)
 
     def load_dataframe(self) -> None:
         self.data_df = pd.read_csv(self.data_dir)
@@ -80,7 +80,7 @@ class RSNADatasetModule(torch.utils.data.Dataset):
 
         self.data_dict = Parallel(n_jobs=3)(
             delayed(self.process)(idx, f)
-            for idx, f in enumerate(image_dir)
+            for idx, f in enumerate(image_dir[:10])
         )
         self.data_dict = dict(ChainMap(*self.data_dict))
 
