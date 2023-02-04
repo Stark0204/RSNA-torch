@@ -93,7 +93,7 @@ class RSNADatasetModule(torch.utils.data.Dataset):
         row = self.data_df.loc[[idx]]
         dicom_image = self.data_dict[idx]['data']
         if self.mode != 'submission':
-            label = np.array(row['cancer'][idx]).astype('float32')
+            label = np.array(row['cancer'][idx]).astype('float32').reshape((1, 1))
         dicom_image_tensor = torch.Tensor(dicom_image.astype('int64', casting='same_kind'))  # Convert image to Tensor
         if self.mode != 'submission':
             return dicom_image_tensor, label
