@@ -10,10 +10,14 @@ from logging import getLogger
 from collections import ChainMap
 from omegaconf import DictConfig
 from joblib import Parallel, delayed
+from pydicom.pixel_data_handlers.util import apply_voi_lut
+from pydicom.pixel_data_handlers.util import apply_modality_lut
 
 log = getLogger(__name__)
 
 data_dict: Dict = dict()
+
+
 def RSNAresize(dicom_image: np.array, width: int, height: int):
     """
     :param height: image to be resized to
@@ -52,7 +56,7 @@ class RSNADatasetModule(torch.utils.data.Dataset):
         self.load_images()
 
     def __len__(self) -> int:
-        return 10#len(self.data_df)
+        return 10  # len(self.data_df)
 
     def load_dataframe(self) -> None:
         self.data_df = pd.read_csv(self.data_dir)
@@ -60,10 +64,25 @@ class RSNADatasetModule(torch.utils.data.Dataset):
 
     def process(self, index, filename):
         data_dict[index] = dict()
-        dicom_image = di.dcmread(filename).pixel_array
+        dicom = di.dcmread(filename)
+        dicom_image = dicom.pixel_array
         # -- START Transformations --
+        # Resize
         dicom_image = RSNAresize(dicom_image, self.cfg.preprocess.resize.width,
-                                 self.cfg.preprocess.resize.height)  # Resize image
+                                 self.cfg.preprocess.resize.height)
+        # Apply modality lut
+        dicom_image = apply_modality_lut(dicom_image, dicom)
+
+        # Apply VOI LUT
+        dicom_image = apply_voi_lut(dicom_image, dicom)
+
+        # subtract from max
+        if dicom.PhotometricInterpretation == "MONOCHROME1":
+            dicom_image = np.amax(dicom_image) - dicom_image
+
+        # Normalization
+        dicom_image = (dicom_image - np.amin(dicom_image)) / (np.amax(dicom_image) - np.amin(dicom_image))
+
         # -- END Transformations   --
         data_dict[index]['data'] = dicom_image
         return data_dict
